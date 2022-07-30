@@ -11,7 +11,7 @@
     <body class="p-3 mb-2 bg-light text-black">
         <div class="container">
             <div id="logoutDiv">
-                <form action="#" method="POST" th:action="@{/login}">
+                <form action="" method="POST" th:action="@{/logout}">
                     <button id="buttonLogout" type="submit" class="btn btn-secondary float-right">Logout</button>
                 </form>
             </div>
@@ -24,8 +24,14 @@
                     </div>
                 </nav>
                 <div id="nav-tabContent" class="tab-content" >
-                    <div id="nav-files" class="tab-pane fade show active"  role="tabpanel" aria-labelledby="nav-files-tab">
-                        <form th:object="${cloudFile}" action="#" th:action="@{/cloudFileUpload}" enctype="multipart/form-data" method="POST">
+                    <div id="nav-files" class="tab-pane fade show active" role="tabpanel" aria-labelledby="nav-files-tab">
+                        <form th:action="@{/file}" action="#" enctype="multipart/form-data" method="POST">
+	                        <div id="success-msg" th:if="${success}" class="alert alert-dark">
+			                    File Upload Success!
+			                </div>
+			                <div id="error-msg" th:if="${uploadError}" class="alert alert-danger">
+			                    <span id="fileUploadMessage" th:text="${uploadError}"></span>
+			                </div>
                             <div class="container">
                                 <div class="row" style="margin: 1em;">
                                     <div class="col-sm-2">

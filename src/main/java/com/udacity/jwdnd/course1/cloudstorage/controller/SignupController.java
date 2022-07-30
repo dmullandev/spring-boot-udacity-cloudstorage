@@ -1,5 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,38 +18,46 @@ import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 @RequestMapping("/signup")
 public class SignupController {
 
-	private final UserService userService;
+    private static final Logger LOG = LogManager.getLogger(SignupController.class);
 
-	public SignupController(UserService userService) {
-		this.userService = userService;
-	}
+    private final UserService userService;
 
-	@GetMapping()
-	public String signupView() {
-		return "signup";
-	}
+    public SignupController(UserService userService) {
+        this.userService = userService;
+    }
 
-	@PostMapping()
-	public String signupUser(@ModelAttribute User user, Model model) {
-		String signupError = null;
+    @GetMapping()
+    public String signupView() {
+        return "signup";
+    }
 
-		if (!userService.isUsernameAvailable(user.getUsername())) {
-			signupError = "The username already exists.";
-		}
+    @PostMapping()
+    public String signupUser(@ModelAttribute User user, Model model) {
+        LOG.info("User signup for username: " + user.getUsername());
+        String signupError = null;
 
-		if (signupError == null) {
-			int rowsAdded = userService.createUser(user);
-			if (rowsAdded < 0) {
-				signupError = "There was an error signing you up. Please try again.";
-			}
-		}
+        if (!userService.isUsernameAvailable(user.getUsername())) {
+            signupError = "The username already exists.";
+        }
 
-		if (signupError == null) {
-			model.addAttribute("signupSuccess", true);
-		} else {
-			model.addAttribute("signupError", signupError);
-		}
+        if (signupError == null) {
+            int rowsAdded = userService.createUser(user);
+            if (rowsAdded < 0) {
+                signupError = "There was an error signing you up. Please try again.";
+            }
+        }
 
-		return "signup";
-	}
+        if (signupError == null) {
+            model.addAttribute("signupSuccess", true);
+        } else {
+            model.addAttribute("signupError", signupError);
+        }
+
+        return "signup";
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        System.out.println("Creating SignupController bean");
+    }
 }

@@ -13,16 +13,16 @@ import com.udacity.jwdnd.course1.cloudstorage.model.CloudFile;
 @Mapper
 public interface CloudFileMapper {
 
-	@Select("SELECT * FROM FILES WHERE fileId = #{cloudFileId}")
-	CloudFile getCloudFile(String cloudFileId);
+    @Select("SELECT * FROM FILES WHERE userid = #{userid} AND filename = #{cloudFilename}")
+    CloudFile getCloudFile(Integer userid, String cloudFilename);
 
-	@Select("SELECT * FROM FILES WHERE userid = #{userid}")
-	List<CloudFile> getAllCloudFiles(Integer userid);
+    @Select("SELECT * FROM FILES WHERE userid = #{userid}")
+    List<CloudFile> getAllCloudFiles(Integer userid);
 
-	@Insert("INSERT INTO FILES (fileId, filename, contenttype, filesize, userid, filedata) VALUES(#{fileId}, #{fileName}), #{contentType}), #{fileSize}), #{userId}), #{fileData})")
-	@Options(useGeneratedKeys = true, keyProperty = "fileId")
-	Integer insertCloudFile(CloudFile cloudFile);
+    @Insert("INSERT INTO FILES (fileId, filename, contenttype, filesize, userid, filedata) VALUES(#{fileId}, #{filename}), #{contenttype}), #{filesize}), #{userid}), #{filedata})")
+    @Options(useGeneratedKeys = true, keyProperty = "fileId")
+    Integer insertCloudFile(CloudFile cloudFile);
 
-	@Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
-	void deleteCloudFile(Integer cloudFileId);
+    @Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
+    void deleteCloudFile(Integer cloudFileId);
 }

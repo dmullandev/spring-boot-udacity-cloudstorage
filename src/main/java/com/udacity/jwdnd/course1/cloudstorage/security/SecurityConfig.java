@@ -12,22 +12,22 @@ import com.udacity.jwdnd.course1.cloudstorage.services.AuthenticationService;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
-	public SecurityConfig(AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
-	}
+    public SecurityConfig(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) {
-		auth.authenticationProvider(this.authenticationService);
-	}
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(this.authenticationService);
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/signup", "/css/**", "/js/**").permitAll().anyRequest().authenticated();
-		http.formLogin().loginPage("/login").permitAll();
-		http.formLogin().defaultSuccessUrl("/home", true);
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests().antMatchers("/signup", "/css/**", "/js/**").permitAll().anyRequest().authenticated();
+        http.formLogin().loginPage("/login").permitAll();
+        http.formLogin().defaultSuccessUrl("/home", true);
+    }
 
 }
