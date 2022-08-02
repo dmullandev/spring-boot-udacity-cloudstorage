@@ -55,15 +55,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-	                                <tr>
+	                                <tr th:each="cloudFile : ${cloudFiles}">
 	                                    <td>
-	                                        <a target="_blank" class="btn btn-success">View</a>
-	                                        <a  class="btn btn-danger">Delete</a>
+	                                        <a th:href="@{/file/fileHandling/view/{cloudFile}(cloudFile = ${cloudFile})}" target="_blank" class="btn btn-success">View</a>
+	                                        <a th:href="@{/file/fileHandling/delete/{cloudFile}(cloudFile = ${cloudFile})}" class="btn btn-danger">Delete</a>
 	                                    </td>
-	                                    <th scope="row" >ExampleFile.txt</th>
-	                                    <th scope="row" th:each="cloudFile : ${cloudFiles}" >
-	                                    	<span th:text="${cloudFile.fileName}">This is a file</span>
-	                                    </th>
+	                                    <th scope="row" th:text="${cloudFile}">ExampleFile.txt</th>
 	                                </tr>
                                 </tbody>
                             </table>

@@ -3,6 +3,8 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
@@ -10,6 +12,7 @@ import com.udacity.jwdnd.course1.cloudstorage.model.User;
 
 @Service
 public class UserService {
+    private static final Logger LOG = LogManager.getLogger(UserService.class);
 
     private UserMapper userMapper;
     private HashService hashService;
@@ -32,6 +35,7 @@ public class UserService {
     }
 
     public int createUser(User user) {
+        LOG.info("Inserting user for username: " + user.getUsername());
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
         random.nextBytes(salt);

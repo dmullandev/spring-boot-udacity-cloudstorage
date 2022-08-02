@@ -15,11 +15,6 @@ public class CloudStorageErrorController implements ErrorController {
     public String handleError(HttpServletRequest request) {
         // get error status
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        String url = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
-
-        // TODO: log error details here
-
-        int statusCode2 = Integer.parseInt(status.toString());
 
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
@@ -35,7 +30,7 @@ public class CloudStorageErrorController implements ErrorController {
         }
 
         // display generic error
-        return url + statusCode2;
+        return "error";
     }
 
     @Override

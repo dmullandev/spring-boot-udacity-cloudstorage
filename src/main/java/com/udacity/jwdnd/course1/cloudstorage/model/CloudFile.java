@@ -10,11 +10,11 @@ public class CloudFile {
 
     /**
      * @param fileId
-     * @param fileName
-     * @param contentType
-     * @param fileSize
-     * @param userId
-     * @param fileData
+     * @param filename
+     * @param contenttype
+     * @param filesize
+     * @param userid
+     * @param filedata
      */
     public CloudFile(Integer fileId, String filename, String contenttype, String filesize, Integer userid,
             byte[] filedata) {

@@ -33,7 +33,7 @@ public class SignupController {
 
     @PostMapping()
     public String signupUser(@ModelAttribute User user, Model model) {
-        LOG.info("User signup for username: " + user.getUsername());
+        LOG.debug("User signup for username: " + user.getUsername());
         String signupError = null;
 
         if (!userService.isUsernameAvailable(user.getUsername())) {

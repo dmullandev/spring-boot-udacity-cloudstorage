@@ -1,7 +1,8 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import java.io.IOException;
-import java.util.List;
+import java.text.MessageFormat;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -25,8 +26,8 @@ public class StorageService {
     private NoteMapper noteMapper;
     private CredentialsMapper credentialsMapper;
 
-    public StorageService(CloudFileMapper cloudFileMapper, NoteMapper noteMapper,
-            CredentialsMapper credentialsMapper, UserService userService) {
+    public StorageService(CloudFileMapper cloudFileMapper, NoteMapper noteMapper, CredentialsMapper credentialsMapper,
+            UserService userService) {
         this.cloudFileMapper = cloudFileMapper;
         this.noteMapper = noteMapper;
         this.credentialsMapper = credentialsMapper;
@@ -39,14 +40,20 @@ public class StorageService {
     }
 
     public Integer insertFile(String username, MultipartFile mpf) {
-        LOG.info("Inserting CloudFile for user: " + username + "for filename: " + mpf.getName());
+
+        LOG.debug(MessageFormat.format("Filename: {0}, Contenttype: {1}, Filesize: {2}, Userid: {3}",
+                mpf.getOriginalFilename(), mpf.getContentType(), mpf.getSize(), username));
 
         try {
-            if (cloudFileMapper.getCloudFile(userService.getUserid(username), mpf.getName()) == null) {
+            if (cloudFileMapper.getCloudFile(userService.getUserid(username), mpf.getOriginalFilename()) == null) {
+                LOG.info("Inserting CloudFile for username: " + username + " for filename: "
+                        + mpf.getOriginalFilename());
 
-                return cloudFileMapper.insertCloudFile(new CloudFile(1, mpf.getName(), mpf.getContentType(),
-                        String.valueOf(mpf.getSize()), userService.getUserid(username), mpf.getBytes()));
+                return cloudFileMapper
+                        .insertCloudFile(new CloudFile(null, mpf.getOriginalFilename(), mpf.getContentType(),
+                                String.valueOf(mpf.getSize()), userService.getUserid(username), mpf.getBytes()));
             } else {
+                // -2 file already exists
                 return -2;
             }
 
@@ -56,13 +63,37 @@ public class StorageService {
         }
     }
 
+    public byte[] viewFile(String username, String filename) {
+        LOG.info(MessageFormat.format("Viewing Cloudfile data for filename {0}", filename));
+
+        return cloudFileMapper.getCloudFile(userService.getUserid(username), filename).getFiledata();
+    }
+
+    public byte[] viewFile(String filename) {
+        LOG.info(MessageFormat.format("Viewing Cloudfile data for filename {0}", filename));
+
+        return cloudFileMapper.viewCloudFile(filename).getFiledata();
+    }
+
+    public Integer deleteFile(String filename) {
+        try {
+            LOG.info(MessageFormat.format("Deleting Cloudfile data with filename {0}", filename));
+            cloudFileMapper.deleteCloudFile(cloudFileMapper.getCloudFileId(filename));
+            return 200;
+        } catch (Exception e) {
+            return -1;
+        }
+
+    }
+
     /**
      * 
      * @param username the username to get all files for
      * @return the list of all uploaded {@link CloudFile}s for {@link User}
      */
-    public List<CloudFile> getCloudFiles(String username) {
-        return cloudFileMapper.getAllCloudFiles(userService.getUserid(username));
+    public String[] getCloudFiles(String username) {
+        return cloudFileMapper.getAllCloudFiles(userService.getUserid(username)).stream()
+                .map(file -> file.getFilename()).collect(Collectors.toList()).toArray(String[]::new);
     }
 
 }

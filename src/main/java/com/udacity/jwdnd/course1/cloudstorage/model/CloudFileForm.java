@@ -2,7 +2,7 @@ package com.udacity.jwdnd.course1.cloudstorage.model;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileForm {
+public class CloudFileForm {
     private MultipartFile file;
 
     /**
