@@ -26,11 +26,11 @@
                 <div id="nav-tabContent" class="tab-content" >
                     <div id="nav-files" class="tab-pane fade show active" role="tabpanel" aria-labelledby="nav-files-tab">
                         <form th:action="@{/file}" action="#" enctype="multipart/form-data" method="POST">
-	                        <div id="success-msg" th:if="${success}" class="alert alert-dark">
-			                    File Upload Success!
+	                        <div id="file-success-msg" th:if="${fileSuccessMessage}" class="alert alert-dark">
+			                    <span id="fileSuccessMessageId" th:text="${fileSuccessMessage}"></span>
 			                </div>
-			                <div id="error-msg" th:if="${uploadError}" class="alert alert-danger">
-			                    <span id="fileUploadMessage" th:text="${uploadError}"></span>
+			                <div id="file-error-msg" th:if="${fileErrorMessage}" class="alert alert-danger">
+			                    <span id="fileErrorMessageId" th:text="${fileErrorMessage}"></span>
 			                </div>
                             <div class="container">
                                 <div class="row" style="margin: 1em;">
@@ -67,6 +67,12 @@
                         </div>
                     </div>
                     <div id="nav-notes" class="tab-pane fade" role="tabpanel" aria-labelledby="nav-notes-tab">
+                    	<div id="note-success-msg" th:if="${noteSuccessMessage}" class="alert alert-dark">
+							<span id="noteSuccessMessageId" th:text="${noteSuccessMessage}"></span>
+						</div>
+						<div id="note-error-msg" th:if="${noteErrorMessage}" class="alert alert-danger">
+							<span id="noteErrorMessageId" th:text="${noteErrorMessage}"></span>
+						</div>
                         <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                             + Add a New Note
                         </button>
@@ -164,6 +170,12 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="#" method="POST">
+                                        	<div id="credential-success-msg" th:if="${credentialSuccessMessage}" class="alert alert-dark">
+							                    <span id="credentialSuccessMessageId" th:text="${credentialSuccessMessage}"></span>
+							                </div>
+							                <div id="credential-error-msg" th:if="${credentialErrorMessage}" class="alert alert-danger">
+							                    <span id="credentialErrorMessageId" th:text="${credentialErrorMessage}"></span>
+							                </div>
                                             <input type="hidden" name="credentialId" id="credential-id">
                                             <div class="form-group">
                                                 <label for="credential-url" class="col-form-label">URL</label>

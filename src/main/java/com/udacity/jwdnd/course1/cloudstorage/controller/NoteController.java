@@ -40,22 +40,22 @@ public class NoteController {
 
         LOG.info(MessageFormat.format("Uploading Note with title ''{0}'' for username ''{1}'' ", noteTitle, username));
 
-        String uploadError = null;
+        String noteUploadError = null;
 
         Integer rowsAdded = storageService
                 .insertNote(new Note(null, noteTitle, noteDescription, userService.getUserid(username)));
 
         if (rowsAdded == -1) {
-            uploadError = "There was an error uploading the note.";
+            noteUploadError = "There was an error uploading the note.";
         } else if (rowsAdded == -2) {
-            uploadError = MessageFormat.format(
-                    "There was a problem uploading the the: The note with title ''{0}'' already exists", noteTitle);
+            noteUploadError = MessageFormat.format(
+                    "There was a problem uploading the note: The note with title ''{0}'' already exists", noteTitle);
         }
 
-        if (uploadError != null) {
-            model.addAttribute("uploadError", uploadError);
+        if (noteUploadError != null) {
+            model.addAttribute("noteErrorMessage", noteUploadError);
         } else {
-            model.addAttribute("success", true);
+            model.addAttribute("noteSuccessMessage", "Note Upload Success!");
         }
 
         model.addAttribute("notes", this.storageService.getNotes(username));

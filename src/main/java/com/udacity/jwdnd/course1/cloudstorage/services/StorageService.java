@@ -126,6 +126,8 @@ public class StorageService {
      * @return the list of all uploaded {@link CloudFile}s for {@link User}
      */
     public List<Note> getNotes(String username) {
-        return noteMapper.getNotesByUserid(userService.getUserid(username)).stream().collect(Collectors.toList());
+        List<Note> notes = noteMapper.getNotesByUserid(userService.getUserid(username)).stream()
+                .collect(Collectors.toList());
+        return notes;
     }
 }

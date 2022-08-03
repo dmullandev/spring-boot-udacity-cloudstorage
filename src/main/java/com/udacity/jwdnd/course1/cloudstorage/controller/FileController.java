@@ -40,45 +40,45 @@ public class FileController {
         LOG.info(MessageFormat.format("Uploading CloudFile with filename ''{0}'' for username ''{1}'' ",
                 fileUpload.getOriginalFilename(), username));
 
-        String uploadError = null;
+        String fileUploadError = null;
 
         Integer rowsAdded = storageService.insertFile(username, fileUpload);
 
         if (rowsAdded == -1) {
-            uploadError = "There was an error uploading the file.";
+            fileUploadError = "There was an error uploading the file.";
         } else if (rowsAdded == -2) {
-            uploadError = MessageFormat.format(
+            fileUploadError = MessageFormat.format(
                     "There was a problem uploading the file: The file ''{0}'' already exists",
                     fileUpload.getOriginalFilename());
         }
 
-        if (uploadError != null) {
-            model.addAttribute("uploadError", uploadError);
+        if (fileUploadError != null) {
+            model.addAttribute("fileErrorMessage", fileUploadError);
         } else {
-            model.addAttribute("success", true);
+            model.addAttribute("fileSuccessMessage", "File Upload Success!");
         }
 
         model.addAttribute("cloudFiles", this.storageService.getCloudFiles(username));
         return "home";
     }
 
-    @GetMapping(value = "/fileHandling/view/{filename}", produces = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody byte[] viewCLoudFile(@PathVariable String filename) throws IOException {
-        return storageService.viewFile(filename);
-    }
-
     @GetMapping(value = "/fileHandling/delete/{filename}")
     public String deleteCloudFile(@PathVariable String filename, Model model, Authentication authentication)
             throws IOException {
-        String uploadError = null;
 
         if (storageService.deleteFile(filename) != 200) {
-            uploadError = MessageFormat.format("Error deleting filename {0}", filename);
-
+            model.addAttribute("fileErrorMessage", MessageFormat.format("Error deleting filename {0}", filename));
+        } else {
+            model.addAttribute("fileSuccessMessage", "File Delete Success!");
         }
 
         model.addAttribute("cloudFiles", this.storageService.getCloudFiles(authentication.getName()));
         return "home";
+    }
+
+    @GetMapping(value = "/fileHandling/view/{filename}", produces = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody byte[] viewCLoudFile(@PathVariable String filename) throws IOException {
+        return storageService.viewFile(filename);
     }
 
     @PostConstruct
