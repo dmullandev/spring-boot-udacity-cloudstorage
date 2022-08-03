@@ -12,16 +12,16 @@ import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 
 @Mapper
 public interface NoteMapper {
-	@Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
-	Note getNote(String noteId);
+    @Select("SELECT * FROM NOTES WHERE userid = #{userid} AND notetitle = #{notetitle}")
+    Note getNote(Integer userid, String notetitle);
 
-	@Insert("INSERT INTO NOTES (noteid, notetitle, notedescription, userid) VALUES(#{noteId}, #{noteTitle}), #{noteDescription}), #{userId})")
-	@Options(useGeneratedKeys = true, keyProperty = "noteid")
-	Integer insertNote(Note note);
+    @Insert("INSERT INTO NOTES (notetitle, notedescription, userid) VALUES(#{notetitle}, #{notedescription}, #{userid})")
+    @Options(useGeneratedKeys = true, keyProperty = "noteid")
+    Integer insertNote(Note note);
 
-	@Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
-	void deleteNote(Integer noteId);
+    @Delete("DELETE FROM NOTES WHERE noteid = #{noteid}")
+    void deleteNote(Integer noteid);
 
-	@Select("SELECT * FROM NOTES WHERE userid = #{userId}")
-	List<Note> getNoteIdsByUser(Integer userId);
+    @Select("SELECT * FROM NOTES WHERE userid = #{userid}")
+    List<Note> getNotesByUserid(Integer userid);
 }

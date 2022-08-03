@@ -2,6 +2,8 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +16,8 @@ import com.udacity.jwdnd.course1.cloudstorage.services.StorageService;
 @RequestMapping("/home")
 public class HomeController {
 
+    private static final Logger LOG = LogManager.getLogger(HomeController.class);
+
     private StorageService storageService;
 
     public HomeController(StorageService storageService) {
@@ -23,12 +27,13 @@ public class HomeController {
     @GetMapping
     public String homeView(Authentication authentication, Model model) {
         model.addAttribute("cloudFiles", storageService.getCloudFiles(authentication.getName()));
+        model.addAttribute("notes", storageService.getNotes(authentication.getName()));
         return "home";
     }
 
     @PostConstruct
     public void postConstruct() {
-        System.out.println("Creating HomeController bean");
+        LOG.info("Creating HomeController bean");
     }
 
 }

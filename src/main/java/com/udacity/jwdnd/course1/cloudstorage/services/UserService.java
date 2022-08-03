@@ -34,6 +34,10 @@ public class UserService {
         return userMapper.getUser(username).getUserid();
     }
 
+    public String getUsernameById(Integer userid) {
+        return userMapper.getUsernameById(userid);
+    }
+
     public int createUser(User user) {
         LOG.info("Inserting user for username: " + user.getUsername());
         SecureRandom random = new SecureRandom();

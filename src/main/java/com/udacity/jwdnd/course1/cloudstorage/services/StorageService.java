@@ -2,6 +2,7 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -15,6 +16,7 @@ import com.udacity.jwdnd.course1.cloudstorage.mapper.CloudFileMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.NoteMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.CloudFile;
+import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 
 @Service
 public class StorageService {
@@ -63,6 +65,28 @@ public class StorageService {
         }
     }
 
+    public Integer insertNote(Note note) {
+
+        LOG.debug(MessageFormat.format("Note Title: {0}, Description: {1}, UserId: {2}, NoteId: {3}",
+                note.getNotetitle(), note.getNotedescription(), note.getUserid(), note.getNoteid()));
+
+        try {
+            if (noteMapper.getNote(note.getUserid(), note.getNotetitle()) == null) {
+                LOG.info(
+                        "Inserting Note for username: " + note.getUserid() + " for Note Title: " + note.getNotetitle());
+
+                return noteMapper.insertNote(note);
+            } else {
+                // -2 file already exists
+                return -2;
+            }
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return -1;
+        }
+    }
+
     public byte[] viewFile(String username, String filename) {
         LOG.info(MessageFormat.format("Viewing Cloudfile data for filename {0}", filename));
 
@@ -96,4 +120,12 @@ public class StorageService {
                 .map(file -> file.getFilename()).collect(Collectors.toList()).toArray(String[]::new);
     }
 
+    /**
+     * 
+     * @param username the username to get all files for
+     * @return the list of all uploaded {@link CloudFile}s for {@link User}
+     */
+    public List<Note> getNotes(String username) {
+        return noteMapper.getNotesByUserid(userService.getUserid(username)).stream().collect(Collectors.toList());
+    }
 }

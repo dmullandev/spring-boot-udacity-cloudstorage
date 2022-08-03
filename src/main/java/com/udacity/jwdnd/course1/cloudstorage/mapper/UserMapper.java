@@ -10,13 +10,16 @@ import com.udacity.jwdnd.course1.cloudstorage.model.User;
 
 @Mapper
 public interface UserMapper {
-	@Select("SELECT * FROM USERS WHERE username = #{username}")
-	User getUser(String username);
+    @Select("SELECT * FROM USERS WHERE username = #{username}")
+    User getUser(String username);
 
-	@Insert("INSERT INTO USERS (userid, username, salt, password, firstname, lastname) VALUES(#{userid}, #{username}, #{salt}, #{password}, #{firstname}, #{lastname})")
-	@Options(useGeneratedKeys = true, keyProperty = "userid")
-	Integer insertUser(User user);
+    @Select("SELECT * FROM USERS WHERE userid = #{userid}")
+    String getUsernameById(Integer userid);
 
-	@Delete("DELETE FROM USERS WHERE userid = #{userId}")
-	void deleteUser(Integer userId);
+    @Insert("INSERT INTO USERS (userid, username, salt, password, firstname, lastname) VALUES(#{userid}, #{username}, #{salt}, #{password}, #{firstname}, #{lastname})")
+    @Options(useGeneratedKeys = true, keyProperty = "userid")
+    Integer insertUser(User user);
+
+    @Delete("DELETE FROM USERS WHERE userid = #{userId}")
+    void deleteUser(Integer userId);
 }

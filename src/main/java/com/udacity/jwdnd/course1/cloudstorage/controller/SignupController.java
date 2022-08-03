@@ -58,6 +58,6 @@ public class SignupController {
 
     @PostConstruct
     public void postConstruct() {
-        System.out.println("Creating SignupController bean");
+        LOG.info("Creating SignupController bean");
     }
 }
