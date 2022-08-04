@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.udacity.jwdnd.course1.cloudstorage.controller.enums.ModalStatus;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CloudFileMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.NoteMapper;
@@ -65,25 +66,27 @@ public class StorageService {
         }
     }
 
-    public Integer insertNote(Note note) {
+    public ModalStatus noteSubmit(String username, Note note) {
 
-        LOG.debug(MessageFormat.format("Note Title: {0}, Description: {1}, UserId: {2}, NoteId: {3}",
-                note.getNotetitle(), note.getNotedescription(), note.getUserid(), note.getNoteid()));
+        boolean saving = note.getNoteid() != 0;
 
         try {
-            if (noteMapper.getNote(note.getUserid(), note.getNotetitle()) == null) {
-                LOG.info(
-                        "Inserting Note for username: " + note.getUserid() + " for Note Title: " + note.getNotetitle());
-
-                return noteMapper.insertNote(note);
+            if (!saving) {
+                LOG.info(MessageFormat.format("Insert Note Title: {0}, Description: {1}, UserId: {2}, NoteId: {3}",
+                        note.getNotetitle(), note.getNotedescription(), note.getUserid(), note.getNoteid()));
+                note.setUserid(userService.getUserid(username));
+                noteMapper.insertNote(note);
+                return ModalStatus.NOTE_INSERT_SUCCESS;
             } else {
-                // -2 file already exists
-                return -2;
+                LOG.info(MessageFormat.format("Saving Note Title: {0}, Description: {1}, UserId: {2}, NoteId: {3}",
+                        note.getNotetitle(), note.getNotedescription(), note.getUserid(), note.getNoteid()));
+                noteMapper.updateNote(note);
+                return ModalStatus.NOTE_SAVE_SUCCESS;
             }
 
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            return -1;
+            return !saving ? ModalStatus.NOTE_INSERT_FAILURE : ModalStatus.NOTE_SAVE_FAILURE;
         }
     }
 
@@ -126,8 +129,7 @@ public class StorageService {
      * @return the list of all uploaded {@link CloudFile}s for {@link User}
      */
     public List<Note> getNotes(String username) {
-        List<Note> notes = noteMapper.getNotesByUserid(userService.getUserid(username)).stream()
-                .collect(Collectors.toList());
-        return notes;
+        return noteMapper.getAllNotes(userService.getUserid(username)).stream().collect(Collectors.toList());
     }
+
 }

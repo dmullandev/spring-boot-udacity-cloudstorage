@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,33 +32,34 @@ public class NoteController {
     }
 
     @PostMapping
-    public String handleNoteUpload(@ModelAttribute("noteTitle") String noteTitle,
-            @ModelAttribute("noteDescription") String noteDescription, Model model, Authentication authentication)
-            throws IOException {
+    public String handleNoteSubmit(Note note, Model model, Authentication authentication) throws IOException {
         String username = authentication.getName();
 
-        LOG.info(MessageFormat.format("Uploading Note with title ''{0}'' for username ''{1}'' ", noteTitle, username));
+        LOG.info(MessageFormat.format("Submitting note with title ''{0}'' for username ''{1}'' ", note.getNotetitle(),
+                username));
 
-        String noteUploadError = null;
+        final String success = "noteSuccessMessage";
+        final String error = "noteErrorMessage";
 
-        Integer rowsAdded = storageService
-                .insertNote(new Note(null, noteTitle, noteDescription, userService.getUserid(username)));
-
-        if (rowsAdded == -1) {
-            noteUploadError = "There was an error uploading the note.";
-        } else if (rowsAdded == -2) {
-            noteUploadError = MessageFormat.format(
-                    "There was a problem uploading the note: The note with title ''{0}'' already exists", noteTitle);
-        }
-
-        if (noteUploadError != null) {
-            model.addAttribute("noteErrorMessage", noteUploadError);
-        } else {
-            model.addAttribute("noteSuccessMessage", "Note Upload Success!");
+        switch (storageService.noteSubmit(username, note)) {
+        case NOTE_INSERT_SUCCESS:
+            model.addAttribute(success, "Note Upload Success!");
+            break;
+        case NOTE_INSERT_FAILURE:
+            model.addAttribute(error, "There was an error inserting the note.");
+            break;
+        case NOTE_SAVE_SUCCESS:
+            model.addAttribute(success, "Note Save Success!");
+            break;
+        case NOTE_SAVE_FAILURE:
+            model.addAttribute(error, "There was an error saving the note.");
+            break;
+        default:
+            break;
         }
 
         model.addAttribute("notes", this.storageService.getNotes(username));
-        return "home";
+        return "result";
     }
 
     @PostConstruct
