@@ -73,7 +73,7 @@
 						<div id="note-error-msg" th:if="${noteErrorMessage}" class="alert alert-danger">
 							<span id="noteErrorMessageId" th:text="${noteErrorMessage}"></span>
 						</div>
-                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
+                        <button id="noteAdd" style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                             + Add a New Note
                         </button>
 
@@ -89,11 +89,11 @@
                                 <tbody>
                                     <tr th:each="note : ${notes}">
                                         <td>
-                                            <button th:onclick="javascript:showNoteModal([[${note}]])" type="button" class="btn btn-success">Edit</button>
-                                            <a th:href="@{/note/noteHandling/delete/{cloudFile}(note = ${note})}" class="btn btn-danger">Delete</a>
+                                            <button id="buttonEditNote" th:onclick="javascript:showNoteModal([[${note}]])" type="button" class="btn btn-success">Edit</button>
+                                            <a id="buttonDeleteNote" th:href="@{/note/noteHandling/delete/{note.noteid}(note.noteid = ${note.noteid})}" class="btn btn-danger">Delete</a>
                                         </td>
-                                        <th scope="row" th:text="${note.notetitle}">Example Note Title</th>
-                                        <td th:text="${note.notedescription}">Example Note Description </td>
+                                        <th id="tableRowNoteTitle" scope="row" th:text="${note.notetitle}">Example Note Title</th>
+                                        <td id="tableRowNoteDescription" th:text="${note.notedescription}">Example Note Description </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -110,28 +110,28 @@
                                     </div>
                                     <div class="modal-body">
                                         <form th:action="@{/note}" action="#" method="POST">
-                                            <input type="hidden" name="noteid" id="noteId">
+                                            <input id="noteId" type="hidden" name="noteid">
                                             <div class="form-group">
-                                                <label for="note-title" class="col-form-label">Title</label>
-                                                <input type="text" name="notetitle" class="form-control" id="noteTitle" maxlength="20" required>
+                                                <label for="noteTitle" class="col-form-label">Title</label>
+                                                <input id="noteTitle" type="text" name="notetitle" class="form-control" maxlength="20" required>
                                             </div>
                                             <div class="form-group">
-                                                <label for="note-description" class="col-form-label">Description</label>
-                                                <textarea class="form-control" name="notedescription" id="noteDescription" rows="5" maxlength="1000" required></textarea>
+                                                <label for="noteDescription" class="col-form-label">Description</label>
+                                                <textarea id="noteDescription" class="form-control" name="notedescription"  rows="5" maxlength="1000" required></textarea>
                                             </div>
                                             <button id="noteSubmit" type="submit" class="d-none"></button>
                                         </form>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();">Save changes</button>
+                                        <button id="closeNoteModal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button id="saveNoteModal" type="button" class="btn btn-primary" onclick="$('#noteSubmit').click();">Save changes</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="nav-credentials" class="tab-pane fade"  role="tabpanel" aria-labelledby="nav-credentials-tab">
-                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
+                        <button id="credentialAdd" style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>
 
@@ -146,16 +146,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>
-                                        <button type="button" class="btn btn-success">Edit</button>
-                                        <a class="btn btn-danger">Delete</a>
-                                    </td>
-                                    <th scope="row">Example Credential URL</th>
-                                    <td>Example Credential Username</td>
-                                    <td>Example Credential Password</td>
-                                </tr>
-                                </tbody>
+                                	<tr th:each="credential : ${credentials}">
+	                                	<td>
+	                                		<button id="buttonEditCredential" th:onclick="javascript:showCredentialModal([[${credential}]])" type="button" class="btn btn-success">Edit</button>
+	                                		<a id="buttonDeleteCredential" th:href="@{/credential/credentialHandling/delete/{credential.credentialid}(credential.credentialid = ${credential.credentialid})}" class="btn btn-danger">Delete</a>
+	                                	</td>
+                                        <th id="tableRowCredentialUrl" scope="row" th:text="${credential.url}">Example URL</th>
+	                                    <td id="tableRowCredentialUsername" th:text="${credential.username}">Example Username </td>
+	                                    <td id="tableRowCredentialPassword" th:text="${credential.password}">Example Password </td>
+                                	</tr>
+								</tbody>
                             </table>
                         </div>
 
@@ -169,32 +169,32 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="#" method="POST">
+                                        <form th:action="@{/credential}" action="#" method="POST">
                                         	<div id="credential-success-msg" th:if="${credentialSuccessMessage}" class="alert alert-dark">
 							                    <span id="credentialSuccessMessageId" th:text="${credentialSuccessMessage}"></span>
 							                </div>
 							                <div id="credential-error-msg" th:if="${credentialErrorMessage}" class="alert alert-danger">
 							                    <span id="credentialErrorMessageId" th:text="${credentialErrorMessage}"></span>
 							                </div>
-                                            <input type="hidden" name="credentialId" id="credential-id">
+                                            <input type="hidden" name="credentialid" id="credentialId">
                                             <div class="form-group">
-                                                <label for="credential-url" class="col-form-label">URL</label>
-                                                <input type="text" name= "url" class="form-control" id="credential-url" maxlength="100" required>
+                                                <label for="credentialUrl" class="col-form-label">URL</label>
+                                                <input id="credentialUrl" type="text" name= "url" class="form-control" maxlength="100" required>
                                             </div>
                                             <div class="form-group">
-                                                <label for="credential-username" class="col-form-label">Username</label>
-                                                <input type="text" name= "username" class="form-control" id="credential-username" maxlength="30" required>
+                                                <label for="credentialUsername" class="col-form-label">Username</label>
+                                                <input id="credentialUsername" type="text" name= "username" class="form-control" maxlength="30" required>
                                             </div>
                                             <div class="form-group">
-                                                <label for="credential-password" class="col-form-label">Password</label>
-                                                <input type="text" name= "password" class="form-control" id="credential-password" maxlength="30" required>
+                                                <label for="credentialPassword" class="col-form-label">Password</label>
+                                                <input id="credentialPassword" type="text" name= "password" class="form-control" maxlength="30" required>
                                             </div>
                                             <button id="credentialSubmit" type="submit" class="d-none"></button>
                                         </form>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" onclick="$('#credentialSubmit').click();">Save changes</button>
+                                        <button id="closeCredentialModal" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button id="saveCredentialModal" type="button" class="btn btn-primary" onclick="$('#credentialSubmit').click();">Save changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -219,11 +219,11 @@
             }
 
             // For opening the credentials modal
-            function showCredentialModal(credentialId, url, username, password) {
-                $('#credential-id').val(credentialId ? credentialId : '');
-                $('#credential-url').val(url ? url : '');
-                $('#credential-username').val(username ? username : '');
-                $('#credential-password').val(password ? password : '');
+            function showCredentialModal(credential) {
+                $('#credentialId').val(credential && credential.credentialid ? credential.credentialid : 0);
+                $('#credentialUrl').val(credential && credential.url ? credential.url : '');
+                $('#credentialUsername').val(credential && credential.username ? credential.username : '');
+                $('#credentialPassword').val(credential && credential.password ? credential.decryptedPassword : '');
                 $('#credentialModal').modal('show');
             }
         </script>

@@ -26,8 +26,9 @@ public class HomeController {
 
     @GetMapping
     public String homeView(Authentication authentication, Model model) {
-        model.addAttribute("cloudFiles", storageService.getCloudFiles(authentication.getName()));
-        model.addAttribute("notes", storageService.getNotes(authentication.getName()));
+        model.addAttribute("cloudFiles", storageService.getAllCloudFiles(authentication.getName()));
+        model.addAttribute("notes", storageService.getAllNotes(authentication.getName()));
+        model.addAttribute("credentials", storageService.getAllCredentials(authentication.getName()));
         return "home";
     }
 

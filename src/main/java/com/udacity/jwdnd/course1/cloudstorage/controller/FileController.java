@@ -26,6 +26,9 @@ public class FileController {
 
     private StorageService storageService;
 
+    private final String fileSuccessMessage = "fileSuccessMessage";
+    private final String fileeErrorMessage = "fileErrorMessage";
+
     private static final Logger LOG = LogManager.getLogger(FileController.class);
 
     public FileController(StorageService storageService) {
@@ -40,25 +43,28 @@ public class FileController {
         LOG.info(MessageFormat.format("Uploading CloudFile with filename ''{0}'' for username ''{1}'' ",
                 fileUpload.getOriginalFilename(), username));
 
-        String fileUploadError = null;
+        final String success = "fileSuccessMessage";
+        final String error = "fileErrorMessage";
 
-        Integer rowsAdded = storageService.insertFile(username, fileUpload);
-
-        if (rowsAdded == -1) {
-            fileUploadError = "There was an error uploading the file.";
-        } else if (rowsAdded == -2) {
-            fileUploadError = MessageFormat.format(
-                    "There was a problem uploading the file: The file ''{0}'' already exists",
-                    fileUpload.getOriginalFilename());
+        switch(storageService.insertFile(username, fileUpload)) {
+            case FILE_INSERT_SUCCESS:
+                model.addAttribute(fileSuccessMessage, "File Upload Success!");
+                break;
+            case FILE_INSERT_FAILURE:
+                model.addAttribute(fileeErrorMessage, "There was an error inserting the file.");
+                break;
+            case FILE_INSERT_DUPLICATE:
+                model.addAttribute(fileeErrorMessage,
+                        MessageFormat.format("There was a problem uploading the file: The file ''{0}'' already exists",
+                                fileUpload.getOriginalFilename()));
+                break;
+            default:
+                LOG.debug(MessageFormat.format("Unknown result uploading file with filename {0} ",
+                        fileUpload.getOriginalFilename()));
+                break;
         }
 
-        if (fileUploadError != null) {
-            model.addAttribute("fileErrorMessage", fileUploadError);
-        } else {
-            model.addAttribute("fileSuccessMessage", "File Upload Success!");
-        }
-
-        model.addAttribute("cloudFiles", this.storageService.getCloudFiles(username));
+        model.addAttribute("cloudFiles", this.storageService.getAllCloudFiles(username));
         return "home";
     }
 
@@ -66,13 +72,20 @@ public class FileController {
     public String deleteCloudFile(@PathVariable String filename, Model model, Authentication authentication)
             throws IOException {
 
-        if (storageService.deleteFile(filename) != 200) {
-            model.addAttribute("fileErrorMessage", MessageFormat.format("Error deleting filename {0}", filename));
-        } else {
-            model.addAttribute("fileSuccessMessage", "File Delete Success!");
+        switch(storageService.deleteFile(filename)) {
+            case FILE_DELETE_SUCCESS:
+                model.addAttribute(fileSuccessMessage, "File Delete Success!");
+                break;
+            case FILE_DELETE_EXCEPTION:
+                model.addAttribute(fileeErrorMessage,
+                        MessageFormat.format("Error deleting filename ''{0}'' ", filename));
+                break;
+            default:
+                LOG.debug(MessageFormat.format("Unknown result deleting file with filename {0} ", filename));
+                break;
         }
 
-        model.addAttribute("cloudFiles", this.storageService.getCloudFiles(authentication.getName()));
+        model.addAttribute("cloudFiles", this.storageService.getAllCloudFiles(authentication.getName()));
         return "home";
     }
 

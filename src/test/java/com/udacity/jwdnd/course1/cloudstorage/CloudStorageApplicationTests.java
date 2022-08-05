@@ -19,6 +19,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
+import com.udacity.jwdnd.course1.cloudstorage.selenium.HomePageObject;
+import com.udacity.jwdnd.course1.cloudstorage.selenium.LoginPageObject;
+import com.udacity.jwdnd.course1.cloudstorage.selenium.SignupPageObject;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,6 +34,25 @@ class CloudStorageApplicationTests {
     private int port;
 
     private WebDriver driver;
+    private HomePageObject homePageObject;
+    private LoginPageObject loginPageObject;
+    private SignupPageObject signupPageObject;
+
+    private final String testFirstname = "testFirstname";
+    private final String testSurname = "testSurname";
+    private final String testUsername = "testUsername";
+    private final String testUsername2 = "testUsername2";
+    private final String testUsername3 = "testUsername3";
+    private final String testPassword = "testPassword";
+    private final String testNoteTitle = "testNoteTitle";
+    private final String testNoteDescription = "testNoteDescription";
+    private final String testNoteTitle2 = "testNoteTitle2";
+    private final String testNoteDescription2 = "testNoteDescription2";
+    private final String testCredentialUrl = "testCredentialUrl";
+    private final String testCredentialUsername = "testCredentialUsername";
+    private final String testCredentialPassword = "testCredentialPassword";
+    private final String testCredentialUrl2 = "testCredentialUrl2";
+    private final String testCredentialUsername2 = "testCredentialUsername2";
 
     @BeforeAll
     static void beforeAll() {
@@ -65,32 +88,9 @@ class CloudStorageApplicationTests {
         WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
         driver.get("http://localhost:" + this.port + "/signup");
         webDriverWait.until(ExpectedConditions.titleContains("Sign Up"));
+        signupPageObject = new SignupPageObject(driver);
 
-        // Fill out credentials
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputFirstName")));
-        WebElement inputFirstName = driver.findElement(By.id("inputFirstName"));
-        inputFirstName.click();
-        inputFirstName.sendKeys(firstName);
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputLastName")));
-        WebElement inputLastName = driver.findElement(By.id("inputLastName"));
-        inputLastName.click();
-        inputLastName.sendKeys(lastName);
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputUsername")));
-        WebElement inputUsername = driver.findElement(By.id("inputUsername"));
-        inputUsername.click();
-        inputUsername.sendKeys(userName);
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputPassword")));
-        WebElement inputPassword = driver.findElement(By.id("inputPassword"));
-        inputPassword.click();
-        inputPassword.sendKeys(password);
-
-        // Attempt to sign up.
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("buttonSignUp")));
-        WebElement buttonSignUp = driver.findElement(By.id("buttonSignUp"));
-        buttonSignUp.click();
+        signupPageObject.signUp(firstName, lastName, userName, password);
 
         /*
          * Check that the sign up was successful. // You may have to modify the element
@@ -99,6 +99,8 @@ class CloudStorageApplicationTests {
          */
 
         LOG.info(MessageFormat.format("The current title is: {0}", driver.getTitle()));
+
+        webDriverWait.until(ExpectedConditions.titleContains("Login"));
 
         Assertions
                 .assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
@@ -112,20 +114,9 @@ class CloudStorageApplicationTests {
         // Log in to our dummy account.
         driver.get("http://localhost:" + this.port + "/login");
         WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+        loginPageObject = new LoginPageObject(driver);
 
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputUsername")));
-        WebElement loginUserName = driver.findElement(By.id("inputUsername"));
-        loginUserName.click();
-        loginUserName.sendKeys(userName);
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inputPassword")));
-        WebElement loginPassword = driver.findElement(By.id("inputPassword"));
-        loginPassword.click();
-        loginPassword.sendKeys(password);
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-button")));
-        WebElement loginButton = driver.findElement(By.id("login-button"));
-        loginButton.click();
+        loginPageObject.enterUsernameAndPassword(userName, password);
 
         webDriverWait.until(ExpectedConditions.titleContains("Home"));
 
@@ -144,9 +135,6 @@ class CloudStorageApplicationTests {
     public void testRedirection() {
         // Create a test account
         doMockSignUp("Redirection", "Test", "RT", "123");
-
-        WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
-        webDriverWait.until(ExpectedConditions.titleContains("Login"));
 
         Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
     }
@@ -202,7 +190,7 @@ class CloudStorageApplicationTests {
         WebElement uploadButton = driver.findElement(By.id("uploadButton"));
         uploadButton.click();
         try {
-            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("success")));
+            webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("file-success-msg")));
         } catch (org.openqa.selenium.TimeoutException e) {
             System.out.println("Large File upload failed");
         }
@@ -210,4 +198,91 @@ class CloudStorageApplicationTests {
 
     }
 
+    private void doLogout() {
+        HomePageObject homePageObject = new HomePageObject(driver);
+        homePageObject.logout();
+    }
+
+    @Test
+    public void testSignupAndLoginFlow() {
+        // Verify signup + login + home access
+        doMockSignUp(testFirstname, testSurname, testUsername, testPassword);
+        doLogIn(testUsername, testPassword);
+        WebDriverWait webDriverWait = new WebDriverWait(driver, 2);
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("fileUpload")));
+        Assertions.assertEquals("Home", driver.getTitle());
+
+        // Verify logout + home no access
+        doLogout();
+        driver.get("http://localhost:" + this.port + "/home");
+        webDriverWait.until(ExpectedConditions.titleContains("Login"));
+
+        Assertions.assertEquals("Login", driver.getTitle());
+    }
+
+    @Test
+    public void testAddingEditingDeletingNotes() throws InterruptedException {
+        // Adding note test
+        doMockSignUp(testFirstname, testSurname, testUsername2, testPassword);
+        doLogIn(testUsername2, testPassword);
+
+        Assertions.assertEquals(driver.getTitle(), "Home");
+
+        homePageObject = new HomePageObject(driver);
+
+        homePageObject.goToNotesTab();
+        homePageObject.submitNote(testNoteTitle, testNoteDescription);
+
+        Assertions.assertEquals(testNoteTitle, homePageObject.getFirstNoteSubmittedTitle());
+        Assertions.assertEquals(testNoteDescription, homePageObject.getFirstNoteSubmittedDescription());
+
+        // Editing note test
+        homePageObject.editNote(testNoteTitle2, testNoteDescription2);
+        Assertions.assertEquals(testNoteTitle2, homePageObject.getFirstNoteSubmittedTitle());
+        Assertions.assertEquals(testNoteDescription2, homePageObject.getFirstNoteSubmittedDescription());
+
+        // Deleting note test
+        homePageObject.deleteNote();
+        Assertions.assertEquals("Home", driver.getTitle());
+        try {
+            homePageObject.goToNotesTab();
+            WebElement noteDeleteButton = driver.findElement(By.id("buttonDeleteNote"));
+            Assertions.fail("Unexpected delete button");
+        } catch (org.openqa.selenium.NoSuchElementException nsee) {
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testAddingEditingDeletingCredentials() throws InterruptedException {
+        // Adding note test
+        doMockSignUp(testFirstname, testSurname, testUsername3, testPassword);
+        doLogIn(testUsername3, testPassword);
+
+        Assertions.assertEquals(driver.getTitle(), "Home");
+
+        homePageObject = new HomePageObject(driver);
+
+        homePageObject.goToCredentialsTab();
+        homePageObject.submitCredential(testCredentialUrl, testCredentialUsername, testCredentialPassword);
+
+        Assertions.assertEquals(testCredentialUrl, homePageObject.getFirstCredentialSubmittedUrl());
+        Assertions.assertEquals(testCredentialUsername, homePageObject.getFirstCredentialSubmittedUsername());
+
+        // Editing note test
+        homePageObject.editCredential(testCredentialUrl2, testCredentialUsername2);
+        Assertions.assertEquals(testCredentialUrl2, homePageObject.getFirstCredentialSubmittedUrl());
+        Assertions.assertEquals(testCredentialUsername2, homePageObject.getFirstCredentialSubmittedUsername());
+
+        // Deleting note test
+        homePageObject.deleteCredential();
+        Assertions.assertEquals("Home", driver.getTitle());
+        try {
+            homePageObject.goToCredentialsTab();
+            WebElement credentialDeleteButton = driver.findElement(By.id("buttonDeleteCredential"));
+            Assertions.fail("Unexpected delete button");
+        } catch (org.openqa.selenium.NoSuchElementException nsee) {
+            Assertions.assertTrue(true);
+        }
+    }
 }

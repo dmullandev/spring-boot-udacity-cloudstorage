@@ -22,13 +22,13 @@ public interface CloudFileMapper {
     @Select("SELECT * FROM FILES WHERE filename = #{cloudFilename}")
     Integer getCloudFileId(String cloudFilename);
 
-    @Select("SELECT * FROM FILES WHERE userid = #{userid}")
-    List<CloudFile> getAllCloudFiles(Integer userid);
-
     @Insert("INSERT INTO FILES (fileId, filename, contenttype, filesize, userid, filedata) VALUES(#{fileId}, #{filename}, #{contenttype}, #{filesize}, #{userid}, #{filedata})")
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
     Integer insertCloudFile(CloudFile cloudFile);
 
     @Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
     void deleteCloudFile(Integer filename);
+
+    @Select("SELECT * FROM FILES WHERE userid = #{userid}")
+    List<CloudFile> getAllCloudFiles(Integer userid);
 }
