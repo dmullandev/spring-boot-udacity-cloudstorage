@@ -131,6 +131,12 @@
                         </div>
                     </div>
                     <div id="nav-credentials" class="tab-pane fade"  role="tabpanel" aria-labelledby="nav-credentials-tab">
+                    	<div id="credential-success-msg" th:if="${credentialSuccessMessage}" class="alert alert-dark">
+							<span id="credentialSuccessMessageId" th:text="${credentialSuccessMessage}"></span>
+						</div>
+						<div id="credential-error-msg" th:if="${noteErrorMessage}" class="alert alert-danger">
+							<span id="credentialErrorMessageId" th:text="${credentialErrorMessage}"></span>
+						</div>
                         <button id="credentialAdd" style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>

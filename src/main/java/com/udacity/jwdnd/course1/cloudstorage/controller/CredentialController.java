@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.services.StorageService;
@@ -36,8 +37,8 @@ public class CredentialController {
     }
 
     @PostMapping
-    public String handleCredentialSubmit(Credential credential, Model model, Authentication authentication)
-            throws IOException {
+    public String handleCredentialSubmit(Credential credential, Model model, RedirectAttributes redirectAttributes,
+            Authentication authentication) throws IOException {
         String username = authentication.getName();
 
         LOG.info(MessageFormat.format("User {0} submitting credential with username ''{0}'' ", username,
@@ -45,22 +46,24 @@ public class CredentialController {
 
         switch(storageService.credentialSubmit(username, credential)) {
             case CREDENTIAL_INSERT_SUCCESS:
-                model.addAttribute(credentialSuccessMessage, "Credential Submit Success!");
+                redirectAttributes.addFlashAttribute(credentialSuccessMessage, "Credential Submit Success!");
                 break;
             case CREDENTIAL_INSERT_FAILURE:
-                model.addAttribute(credentialErrorMessage, "There was an error inserting the credential.");
+                redirectAttributes.addFlashAttribute(credentialErrorMessage,
+                        "There was an error inserting the credential.");
                 break;
             case CREDENTIAL_INSERT_EXCEPTION:
-                model.addAttribute(credentialErrorMessage, credentialExceptionMessage);
+                redirectAttributes.addFlashAttribute(credentialErrorMessage, credentialExceptionMessage);
                 break;
             case CREDENTIAL_SAVE_SUCCESS:
-                model.addAttribute(credentialSuccessMessage, "Credential Save Success!");
+                redirectAttributes.addFlashAttribute(credentialSuccessMessage, "Credential Save Success!");
                 break;
             case CREDENTIAL_SAVE_FAILURE:
-                model.addAttribute(credentialErrorMessage, credentialExceptionMessage);
+                redirectAttributes.addFlashAttribute(credentialErrorMessage, credentialExceptionMessage);
                 break;
             case CREDENTIAL_SAVE_EXCEPTION:
-                model.addAttribute(credentialErrorMessage, "There was an exception trying to store the credential.");
+                redirectAttributes.addFlashAttribute(credentialErrorMessage,
+                        "There was an exception trying to store the credential.");
                 break;
             default:
                 LOG.debug(MessageFormat.format("Unknown result submitting credential with username ''{0}'' ",
@@ -72,15 +75,15 @@ public class CredentialController {
     }
 
     @GetMapping(value = "/credentialHandling/delete/{credentialid}")
-    public String deleteCredential(@PathVariable Integer credentialid, Model model, Authentication authentication)
-            throws IOException {
+    public String deleteCredential(@PathVariable Integer credentialid, Model model,
+            RedirectAttributes redirectAttributes, Authentication authentication) throws IOException {
 
         switch(storageService.deleteCredential(credentialid)) {
             case CREDENTIAL_DELETE_SUCCESS:
-                model.addAttribute(credentialSuccessMessage, "Credential Delete Success!");
+                redirectAttributes.addFlashAttribute(credentialSuccessMessage, "Credential Delete Success!");
                 break;
             case CREDENTIAL_DELETE_EXCEPTION:
-                model.addAttribute(credentialErrorMessage,
+                redirectAttributes.addFlashAttribute(credentialErrorMessage,
                         MessageFormat.format("Error deleting credential with id ''{0}'' ", credentialid));
                 break;
             default:

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import com.udacity.jwdnd.course1.cloudstorage.services.StorageService;
@@ -37,7 +38,8 @@ public class NoteController {
     }
 
     @PostMapping
-    public String handleNoteSubmit(Note note, Model model, Authentication authentication) throws IOException {
+    public String handleNoteSubmit(Note note, Model model, RedirectAttributes redirectAttributes,
+            Authentication authentication) throws IOException {
         String username = authentication.getName();
 
         LOG.info(MessageFormat.format("Submitting note with title ''{0}'' for username ''{1}'' ", note.getNotetitle(),
@@ -45,16 +47,16 @@ public class NoteController {
 
         switch(storageService.noteSubmit(username, note)) {
             case NOTE_INSERT_SUCCESS:
-                model.addAttribute(noteSuccessMessage, "Note Submit Success!");
+                redirectAttributes.addFlashAttribute(noteSuccessMessage, "Note Submit Success!");
                 break;
             case NOTE_INSERT_FAILURE:
-                model.addAttribute(noteErrorMessage, "There was an error inserting the note.");
+                redirectAttributes.addFlashAttribute(noteErrorMessage, "There was an error inserting the note.");
                 break;
             case NOTE_SAVE_SUCCESS:
-                model.addAttribute(noteSuccessMessage, "Note Save Success!");
+                redirectAttributes.addFlashAttribute(noteSuccessMessage, "Note Edit Success!");
                 break;
             case NOTE_SAVE_FAILURE:
-                model.addAttribute(noteErrorMessage, "There was an error saving the note.");
+                redirectAttributes.addFlashAttribute(noteErrorMessage, "There was an error saving the note.");
                 break;
             default:
                 LOG.debug(
@@ -67,15 +69,15 @@ public class NoteController {
     }
 
     @GetMapping(value = "/noteHandling/delete/{noteid}")
-    public String deleteNote(@PathVariable Integer noteid, Model model, Authentication authentication)
-            throws IOException {
+    public String deleteNote(@PathVariable Integer noteid, Model model, RedirectAttributes redirectAttributes,
+            Authentication authentication) throws IOException {
 
         switch(storageService.deleteNote(noteid)) {
             case NOTE_DELETE_SUCCESS:
-                model.addAttribute(noteSuccessMessage, "Note Delete Success!");
+                redirectAttributes.addFlashAttribute(noteSuccessMessage, "Note Delete Success!");
                 break;
             case NOTE_DELETE_EXCEPTION:
-                model.addAttribute(noteErrorMessage,
+                redirectAttributes.addFlashAttribute(noteErrorMessage,
                         MessageFormat.format("Error deleting note with id ''{0}'' ", noteid));
                 break;
             default:
